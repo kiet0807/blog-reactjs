@@ -7,9 +7,9 @@ import { Button, Modal } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { formatDateTime } from '../../helpers/common';
 
-const UserList = () => {
+const PostList = () => {
   const dispatch = useDispatch();
-  const [users, setUsers] = useState([]);
+  const [posts, setPosts] = useState([]);
   const [numOfPage, setNumOfPage] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
@@ -26,16 +26,29 @@ const UserList = () => {
       element: (row) => row.id,
     },
     {
-      name: 'First name',
-      element: (row) => row.first_name,
+      name: 'Title',
+      element: (row) => row.title,
     },
     {
-      name: 'Last name',
-      element: (row) => row.last_name,
+      name: 'Summary',
+      element: (row) => row.summary,
     },
     {
-      name: 'Email',
-      element: (row) => row.email,
+      name: 'Thumbnail',
+      element: (row) => (
+        <img
+          width="70px"
+          src={process.env.REACT_APP_API_URL + '/' + row.thumbnail}
+        />
+      ),
+    },
+    {
+      name: 'Category',
+      element: (row) => row.category.name,
+    },
+    {
+      name: 'Status',
+      element: (row) => (row.status === 1 ? 'Active' : 'Inactive'),
     },
     {
       name: 'Created at',
@@ -50,7 +63,7 @@ const UserList = () => {
       element: (row) => (
         <>
           <Link
-            to={`/user/edit/${row.id}`}
+            to={`/post/edit/${row.id}`}
             className="btn btn-sm btn-warning me-1"
           >
             <i className="fa fa-pencil"></i>
@@ -114,10 +127,10 @@ const UserList = () => {
   useEffect(() => {
     dispatch(actions.controlLoading(true));
     let query = `?items_per_page=${itemsPerPage}&page=${currentPage}&search=${searchString}`;
-    requestApi(`/users${query}`, 'GET', [])
+    requestApi(`/posts${query}`, 'GET', [])
       .then((response) => {
         console.log('response=> ', response);
-        setUsers(response.data.data);
+        setPosts(response.data.data);
         setNumOfPage(response.data.lastPage);
         dispatch(actions.controlLoading(false));
       })
@@ -139,7 +152,7 @@ const UserList = () => {
             <li className="breadcrumb-item active">Tables</li>
           </ol>
           <div className="mb-3">
-            <Link to="/user/add" className="btn btn-sm btn-success me-2">
+            <Link to="/post/add" className="btn btn-sm btn-success me-2">
               <i className="fa fa-plus"></i> Add new
             </Link>
             {selectedRows.length > 0 && (
@@ -153,8 +166,8 @@ const UserList = () => {
             )}
           </div>
           <DataTable
-            name="List Users"
-            data={users}
+            name="List Posts"
+            data={posts}
             columns={columns}
             numOfPage={numOfPage}
             total={false}
@@ -188,4 +201,4 @@ const UserList = () => {
   );
 };
 
-export default UserList;
+export default PostList;
